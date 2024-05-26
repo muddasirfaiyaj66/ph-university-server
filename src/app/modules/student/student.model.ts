@@ -1,5 +1,5 @@
 import validator from 'validator';
-import { Schema, model, connect } from 'mongoose';
+import { Schema, model} from 'mongoose';
 import {
   TGuardian,
   TLocalGuardian,
@@ -7,9 +7,7 @@ import {
   StudentModel,
   TUserName,
 } from './student.interface';
-import bcrypt from 'bcrypt'
-import { number } from 'joi';
-import config from '../../config';
+
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
@@ -103,12 +101,13 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     required: [true, 'ID is required'],
     unique: true,
   },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    maxlength:[20,'password cannot be more than 20 character']
-
+  user:{
+    type: Schema.Types.ObjectId,
+    required: [true, 'UserID is required'],
+    unique: true,
+    ref:'User'
   },
+
   name: {
     type: userNameSchema,
     required: [true, 'Name is required'],
@@ -163,12 +162,7 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     type: localGuardianSchema,
     required: [true, 'Local guardian information is required'],
   },
-  isActive: {
-    type: String,
-    enum: ['active', 'inActive'],
-    required: [true, 'Status is required'],
-    default: 'active',
-  },
+  
   profileImg: {
     type: String,
   },
@@ -189,22 +183,7 @@ studentSchema.virtual('fullName').get(function() {
 
 
 
-//pre save middleware/hooks: will work on create() save()
-studentSchema.pre('save',async function(next){
-  // console.log(this,"pre hook we wil save the data");
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
 
-  user.password =await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds))
-  next()
-})
-
-studentSchema.post('save',function(doc,next){
-  doc.password=''
-  // console.log(this,"post hook. we save our data");
-  next()
-  
-})
 
 //query middleware
 studentSchema.pre('find', function(next){

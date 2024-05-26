@@ -1,4 +1,4 @@
-import { optional } from 'joi';
+
 import { z } from 'zod';
 
 // Define the Zod schema for the UserName sub-document
