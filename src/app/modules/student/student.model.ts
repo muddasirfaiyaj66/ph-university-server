@@ -6,6 +6,8 @@ import {
   StudentModel,
   TUserName,
 } from './student.interface';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -162,10 +164,9 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: localGuardianSchema,
       required: [true, 'Local guardian information is required'],
     },
-    admissionSemester:{
-      type:Schema.Types.ObjectId,
-      ref:'AcademicSemester'
-
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicSemester',
     },
 
     profileImg: {
@@ -175,10 +176,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: Boolean,
       default: false,
     },
-    academicDepartment:{
-      type:Schema.Types.ObjectId,
-      ref:'AcademicDepartment'
-    }
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
+    },
   },
   {
     toJSON: {
@@ -206,11 +207,21 @@ studentSchema.pre('aggregate', function (next) {
   next();
 });
 
+studentSchema.pre('findOneAndUpdate', async function (next) {
+  const query = this.getQuery();
+
+  const isStudentExist = await Student.findOne(query);
+
+  if (!isStudentExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "This Student doesn't exist");
+  }
+  next();
+});
+
 //creating  a custom static method
 
 studentSchema.statics.isStudentExist = async function (id: string) {
   const existingStudent = await Student.findOne({ id });
-
   return existingStudent;
 };
 
