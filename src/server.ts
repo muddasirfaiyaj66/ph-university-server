@@ -1,20 +1,37 @@
+import { Server } from 'http';
+import mongoose from 'mongoose';
 import app from './app';
 import config from './app/config';
 
-import mongoose from 'mongoose';
-
-main().catch((err) => console.log(err));
+let server: Server;
 
 async function main() {
   try {
     await mongoose.connect(config.database_url as string);
 
-    app.listen(config.port, () => {
-      console.log(`Server is listening on port ${config.port}`);
+    server = app.listen(config.port, () => {
+      console.log(`app is listening on port ${config.port}`);
     });
   } catch (err) {
     console.log(err);
   }
-
-  // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
+
+main();
+
+process.on('unhandledRejection', () => {
+  console.log(`😈 unahandledRejection is detected , shutting down ...`);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+
+process.on('uncaughtException', () => {
+  console.log(`😈 uncaughtException is detected , shutting down ...`);
+  process.exit(1);
+});
+
+
