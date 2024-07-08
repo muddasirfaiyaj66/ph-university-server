@@ -47,7 +47,10 @@ academicSemesterSchema.pre('save', async function (next) {
   });
 
   if (isSemesterExists) {
-    throw new AppError(httpStatus.NOT_ACCEPTABLE,'Semester is already exists!');
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      'Semester is already exists!',
+    );
   }
 
   next();

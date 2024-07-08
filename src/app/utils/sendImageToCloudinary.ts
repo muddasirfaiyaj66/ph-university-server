@@ -3,14 +3,16 @@ import fs from 'fs';
 import multer from 'multer';
 import config from '../config';
 
-
 cloudinary.config({
   cloud_name: config.cloudinary_cloud_name,
   api_key: config.cloudinary_api_key,
   api_secret: config.cloudinary_api_secret,
 });
 
-export const sendImageToCloudinary = (imageName: string, path: string):Promise<Record<string,unknown>> => {
+export const sendImageToCloudinary = (
+  imageName: string,
+  path: string,
+): Promise<Record<string, unknown>> => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(
       path,
@@ -23,9 +25,9 @@ export const sendImageToCloudinary = (imageName: string, path: string):Promise<R
         // delete a file asynchronously
         fs.unlink(path, (err) => {
           if (err) {
-            console.log(err);
+            // console.log(err);
           } else {
-            console.log('File is deleted.');
+            // console.log('File is deleted.');
           }
         });
       },

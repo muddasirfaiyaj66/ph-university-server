@@ -1,9 +1,7 @@
 import { Schema, model } from 'mongoose';
 import {
   TCourse,
-  
   TCourseFaculty,
-  
   TPreRequisiteCourses,
 } from './course.interface';
 

@@ -78,14 +78,14 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
     },
     profileImg: { type: String, default: '' },
     academicDepartment: {
-        type: Schema.Types.ObjectId,
-        ref: 'AcademicDepartment',
-      },
-      academicFaculty: {
-        type: Schema.Types.ObjectId,
-        required: [true, 'Academic Faculty is required'],
-        ref: 'AcademicFaculty',
-      },
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'Academic Faculty is required'],
+      ref: 'AcademicFaculty',
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -100,9 +100,8 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
 
 // generating full name
 facultySchema.virtual('fullName').get(function () {
-    return `${this?.name?.firstName} ${this?.name?.middleName ? this?.name?.middleName + ' ' : ''}${this?.name?.lastName}`;
-  });
-  
+  return `${this?.name?.firstName} ${this?.name?.middleName ? this?.name?.middleName + ' ' : ''}${this?.name?.lastName}`;
+});
 
 // filter out deleted documents
 facultySchema.pre('find', function (next) {

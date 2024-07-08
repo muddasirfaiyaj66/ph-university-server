@@ -3,33 +3,35 @@ import { TAcademicFaculty } from './academicFaculty.interface';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 
-const academicFacultySchema = new Schema<TAcademicFaculty>({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
+const academicFacultySchema = new Schema<TAcademicFaculty>(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
   },
-},
-{
-  timestamps:true,
-});
+  {
+    timestamps: true,
+  },
+);
 
-academicFacultySchema.pre('save', async function(next){
+academicFacultySchema.pre('save', async function (next) {
   const isAcademicFacultyExist = await AcademicFaculty.findOne({
-    name:this.name
+    name: this.name,
   });
-  if(isAcademicFacultyExist){
-    throw new AppError(httpStatus.NOT_FOUND,"Academic Faculty already Exist")
+  if (isAcademicFacultyExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic Faculty already Exist');
   }
   next();
 });
 
-academicFacultySchema.pre('findOneAndUpdate', async function(next){
+academicFacultySchema.pre('findOneAndUpdate', async function (next) {
   const query = this.getQuery();
   const isAcademicFacultyExist = await AcademicFaculty.findOne(query);
 
-  if(!isAcademicFacultyExist){
-    throw new AppError(httpStatus.NOT_FOUND,"This faculty doesn't exist")
+  if (!isAcademicFacultyExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "This faculty doesn't exist");
   }
   next();
 });

@@ -1,4 +1,4 @@
-import {  Model, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export type TGuardian = {
   fatherName: string;
@@ -31,8 +31,8 @@ export type TBloodGroup =
 
 export type TStudent = {
   id: string;
-  user:Types.ObjectId;
-  password:string;
+  user: Types.ObjectId;
+  password: string;
   name: TUserName;
   gender: 'male' | 'female';
   dateOfBirth: Date;
@@ -45,21 +45,20 @@ export type TStudent = {
   guardian: TGuardian;
   localGuardian: TLocalGuardian;
   profileImg?: string;
-  admissionSemester:Types.ObjectId;
-  academicDepartment:Types.ObjectId;
+  admissionSemester: Types.ObjectId;
+  academicDepartment: Types.ObjectId;
   academicFaculty: Types.ObjectId;
-  isDeleted:boolean;
-
+  isDeleted: boolean;
 };
 
-//for creating static 
+//for creating static
 
 export interface StudentModel extends Model<TStudent> {
   // eslint-disable-next-line no-unused-vars
-  isStudentExist(id:string):Promise<TStudent | null>
+  isStudentExist(id: string): Promise<TStudent | null>;
 }
 
-//for creating custom instance 
+//for creating custom instance
 // export type StudentMethods = {
 //   isStudentExist(id: string): Promise<TStudent | null> ;
 // };

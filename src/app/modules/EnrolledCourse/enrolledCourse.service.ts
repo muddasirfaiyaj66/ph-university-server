@@ -6,7 +6,6 @@ import AppError from '../../errors/AppError';
 
 import { OfferedCourse } from '../OfferedCourse/OfferedCourse.model';
 
-
 import { TEnrolledCourse } from './enrolledCourse.interface';
 import EnrolledCourse from './enrolledCourse.model';
 import { calculateGradeAndPoints } from './enrolledCourse.utils';

@@ -5,7 +5,6 @@ import { AcademicFacultyControllers } from './academicFaculty.controller';
 import { USER_ROLE } from '../user/user.constant';
 import { AcademicFacultyValidations } from './academicFaculty.validation';
 
-
 const router = express.Router();
 
 router.post(

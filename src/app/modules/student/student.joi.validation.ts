@@ -39,48 +39,48 @@ const userNameValidationSchema = Joi.object({
 // Define the Joi schema for the Guardian sub-document
 const guardianValidationSchema = Joi.object({
   fatherName: Joi.string().required().messages({
-    'string.base': 'Father\'s name must be a string',
-    'string.empty': 'Father\'s name is required',
+    'string.base': "Father's name must be a string",
+    'string.empty': "Father's name is required",
   }),
   fatherOccupation: Joi.string().required().messages({
-    'string.base': 'Father\'s occupation must be a string',
-    'string.empty': 'Father\'s occupation is required',
+    'string.base': "Father's occupation must be a string",
+    'string.empty': "Father's occupation is required",
   }),
   fatherContactNo: Joi.string().required().messages({
-    'string.base': 'Father\'s contact number must be a string',
-    'string.empty': 'Father\'s contact number is required',
+    'string.base': "Father's contact number must be a string",
+    'string.empty': "Father's contact number is required",
   }),
   motherName: Joi.string().required().messages({
-    'string.base': 'Mother\'s name must be a string',
-    'string.empty': 'Mother\'s name is required',
+    'string.base': "Mother's name must be a string",
+    'string.empty': "Mother's name is required",
   }),
   motherOccupation: Joi.string().required().messages({
-    'string.base': 'Mother\'s occupation must be a string',
-    'string.empty': 'Mother\'s occupation is required',
+    'string.base': "Mother's occupation must be a string",
+    'string.empty': "Mother's occupation is required",
   }),
   motherContactNo: Joi.string().required().messages({
-    'string.base': 'Mother\'s contact number must be a string',
-    'string.empty': 'Mother\'s contact number is required',
+    'string.base': "Mother's contact number must be a string",
+    'string.empty': "Mother's contact number is required",
   }),
 });
 
 // Define the Joi schema for the LocalGuardian sub-document
 const localGuardianValidationSchema = Joi.object({
   name: Joi.string().required().messages({
-    'string.base': 'Local guardian\'s name must be a string',
-    'string.empty': 'Local guardian\'s name is required',
+    'string.base': "Local guardian's name must be a string",
+    'string.empty': "Local guardian's name is required",
   }),
   occupation: Joi.string().required().messages({
-    'string.base': 'Local guardian\'s occupation must be a string',
-    'string.empty': 'Local guardian\'s occupation is required',
+    'string.base': "Local guardian's occupation must be a string",
+    'string.empty': "Local guardian's occupation is required",
   }),
   contactNo: Joi.string().required().messages({
-    'string.base': 'Local guardian\'s contact number must be a string',
-    'string.empty': 'Local guardian\'s contact number is required',
+    'string.base': "Local guardian's contact number must be a string",
+    'string.empty': "Local guardian's contact number is required",
   }),
   address: Joi.string().required().messages({
-    'string.base': 'Local guardian\'s address must be a string',
-    'string.empty': 'Local guardian\'s address is required',
+    'string.base': "Local guardian's address must be a string",
+    'string.empty': "Local guardian's address is required",
   }),
 });
 
@@ -116,11 +116,14 @@ const studentValidationSchema = Joi.object({
     'string.base': 'Emergency contact number must be a string',
     'string.empty': 'Emergency contact number is required',
   }),
-  bloodGroup: Joi.string().valid('A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-').required().messages({
-    'string.base': 'Blood group must be a string',
-    'string.empty': 'Blood group is required',
-    'any.only': '{#value} is not a valid blood group',
-  }),
+  bloodGroup: Joi.string()
+    .valid('A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-')
+    .required()
+    .messages({
+      'string.base': 'Blood group must be a string',
+      'string.empty': 'Blood group is required',
+      'any.only': '{#value} is not a valid blood group',
+    }),
   presentAddress: Joi.string().required().messages({
     'string.base': 'Present address must be a string',
     'string.empty': 'Present address is required',
@@ -145,7 +148,6 @@ const studentValidationSchema = Joi.object({
   profileImg: Joi.string().optional().messages({
     'string.base': 'Profile image must be a string',
   }),
-  
 });
 
 export default studentValidationSchema;
