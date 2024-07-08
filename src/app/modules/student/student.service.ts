@@ -1,104 +1,43 @@
-import mongoose from 'mongoose';
-import { Student } from './student.model';
-import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
-import { User } from '../user/user.model';
-import { TStudent } from './student.interface';
+import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
+import AppError from '../../errors/AppError';
+
+import { TStudent } from './student.interface';
+import { Student } from './student.model';
 import { studentSearchAbleFields } from './student.constant';
+import { User } from '../user/user.model';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  // const queryObj = { ...query };
-
-  // let searchTerm = '';
-  // //{email:{$regex:query.searchTerm, $option:i}}
-  // if (query?.searchTerm) {
-  //   searchTerm = query?.searchTerm as string;
-  // }
-
-  // const searchQuery = Student.find({
-  //   $or: studentSearchAbleFields.map((field) => ({
-  //     [field]: { $regex: searchTerm, $options: 'i' },
-  //   })),
-  // });
-
-  //filtering
-
-  // const excludeFiles = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
-
-  // excludeFiles.forEach((el) => delete queryObj[el]);
-
-  // const filterQuery = searchQuery
-  //   .find(queryObj)
-  //   .populate('admissionSemester')
-  //   .populate({
-  //     path: 'academicDepartment',
-  //     populate: {
-  //       path: 'academicFaculty',
-  //     },
-  //   });
-
-  // let sort = '-createdAt';
-  // if (query.sort) {
-  //   sort = query.sort as string;
-  // }
-  // const sortQuery = filterQuery.sort(sort);
-  // let page = 1;
-  // let limit = 1;
-  // let skip = 0;
-  // if (query.limit) {
-  //   limit = Number(query.limit);
-  // }
-  // if (query.page) {
-  //   page = Number(query.page);
-  //   skip = (page - 1) * limit;
-  // }
-
-  // const paginateQuery = sortQuery.skip(skip);
-
-  // const limitQuery =  paginateQuery.limit(limit);
-
-  // //fields limiting
-  // let fields = '-__v';
-  // if(query.fields){
-  //   fields = (query.fields as string).split(',').join(' ')
-
-  // }
-
-  // const fieldsQuery = await limitQuery.select(fields)
-  // return fieldsQuery;
-
-  const studentQuery = new QueryBuilder(Student.find(), query)
+  const studentQuery = new QueryBuilder(
+    Student.find()
+      .populate('user')
+      .populate('admissionSemester')
+      .populate('academicDepartment academicFaculty'),
+    query,
+  )
     .search(studentSearchAbleFields)
     .filter()
     .sort()
     .paginate()
     .fields();
 
-  const result = await studentQuery.modelQuery
-    .populate('admissionSemester')
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    });
-  return result;
-};
-const getSingleStudentsFromDB = async (id: string) => {
-  // const result = await Student.findOne({ id });
+  const meta = await studentQuery.countTotal();
+  const result = await studentQuery.modelQuery;
 
-  // const result = await Student.aggregate([{ $match: { id: id } }]);
-  const result = await Student.findById( id)
+  return {
+    meta,
+    result,
+  };
+};
+
+const getSingleStudentFromDB = async (id: string) => {
+  const result = await Student.findById(id)
     .populate('admissionSemester')
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    });
+    .populate('academicDepartment academicFaculty');
   return result;
 };
+
 const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
   const { name, guardian, localGuardian, ...remainingStudentData } = payload;
 
@@ -106,59 +45,60 @@ const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
     ...remainingStudentData,
   };
 
+ 
+
   if (name && Object.keys(name).length) {
     for (const [key, value] of Object.entries(name)) {
       modifiedUpdatedData[`name.${key}`] = value;
     }
   }
+
   if (guardian && Object.keys(guardian).length) {
     for (const [key, value] of Object.entries(guardian)) {
       modifiedUpdatedData[`guardian.${key}`] = value;
     }
   }
+
   if (localGuardian && Object.keys(localGuardian).length) {
     for (const [key, value] of Object.entries(localGuardian)) {
       modifiedUpdatedData[`localGuardian.${key}`] = value;
     }
   }
 
-  const result = await Student.findByIdAndUpdate( id , modifiedUpdatedData, {
+  const result = await Student.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
-
   return result;
 };
-const deleteSingleStudentsFromDB = async (id: string) => {
+
+const deleteStudentFromDB = async (id: string) => {
   const session = await mongoose.startSession();
 
   try {
-    if (!Student.isStudentExist) {
-      throw new AppError(httpStatus.NOT_FOUND, "This Student doesn't exist");
-    }
-
     session.startTransaction();
+
     const deletedStudent = await Student.findByIdAndUpdate(
-       id ,
+      id,
       { isDeleted: true },
       { new: true, session },
     );
-
 
     if (!deletedStudent) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Student');
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
     }
-     // get user _id from deletedStudent
-     const userId = deletedStudent.user;
-    const deleteUser = await User.findByIdAndUpdate(
-       userId ,
 
+    // get user _id from deletedStudent
+    const userId = deletedStudent.user;
+
+    const deletedUser = await User.findByIdAndUpdate(
+      userId,
       { isDeleted: true },
       { new: true, session },
     );
 
-    if (!deleteUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete User');
+    if (!deletedUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
     }
 
     await session.commitTransaction();
@@ -174,7 +114,7 @@ const deleteSingleStudentsFromDB = async (id: string) => {
 
 export const StudentServices = {
   getAllStudentsFromDB,
-  getSingleStudentsFromDB,
-  deleteSingleStudentsFromDB,
+  getSingleStudentFromDB,
   updateStudentIntoDB,
+  deleteStudentFromDB,
 };

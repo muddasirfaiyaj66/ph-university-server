@@ -1,19 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { TUserRole } from '../modules/user/user.interface';
-import catchAsync from '../utils/catchAsync';
-import AppError from '../errors/AppError';
 import config from '../config';
-import { User } from '../modules/user/user.model';
+import AppError from '../errors/AppError';
 
+import catchAsync from '../utils/catchAsync';
+import { TUserRole } from '../modules/user/user.interface';
+import { User } from '../modules/user/user.model';
 
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
-    // const token = (req.headers.cookie?.split("="))[1];
-    
-    
 
     // checking if the token is missing
     if (!token) {
@@ -66,7 +63,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
       );
     }
 
-    req.user = decoded as JwtPayload;
+    req.user = decoded as JwtPayload & { role: string };
     next();
   });
 };

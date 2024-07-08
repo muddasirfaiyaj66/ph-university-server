@@ -1,13 +1,12 @@
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { TLoginUser } from './auth.interface';
-import { User } from '../user/user.model';
-import AppError from '../../errors/AppError';
-import { createToken, verifyToken } from './auth.utils';
 import config from '../../config';
+import AppError from '../../errors/AppError';
 import { sendEmail } from '../../utils/sendEmail';
-
+import { TLoginUser } from './auth.interface';
+import { createToken, verifyToken } from './auth.utils';
+import { User } from '../user/user.model';
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
@@ -196,16 +195,7 @@ const forgetPassword = async (userId: string) => {
     '10m',
   );
 
-  const resetUILink = `<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
-    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <h2 style="color: #333333;">Reset Your Password</h2>
-        <p style="color: #666666;">Hi ${user.role},</p>
-        <p style="color: #666666;">We received a request to reset your password. Click the button below to reset your password:</p>
-        <a href="${config.reset_pass_ui_link}?id=${user.id}&token=${resetToken}" style="display: inline-block; background-color: #007bff; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin: 20px 0;">Reset Password</a>
-        <p style="color: #666666;">If you did not request a password reset, please ignore this email or contact support if you have questions.</p>
-        <p style="color: #666666;">Thanks,<br>The Support Team</p>
-    </div>
-</body>`;
+  const resetUILink = `${config.reset_pass_ui_link}?id=${user.id}&token=${resetToken} `;
 
   sendEmail(user.email, resetUILink);
 

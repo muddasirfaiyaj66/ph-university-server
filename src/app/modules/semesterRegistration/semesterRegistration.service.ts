@@ -3,11 +3,12 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../errors/AppError';
+
 import { OfferedCourse } from '../OfferedCourse/OfferedCourse.model';
-import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { RegistrationStatus } from './semesterRegistration.constant';
 import { TSemesterRegistration } from './semesterRegistration.interface';
 import { SemesterRegistration } from './semesterRegistration.model';
+import { AcademicSemester } from '../academicSemester/academicSemester.model';
 
 const createSemesterRegistrationIntoDB = async (
   payload: TSemesterRegistration,
@@ -33,7 +34,7 @@ const createSemesterRegistrationIntoDB = async (
   if (isThereAnyUpcomingOrOngoingSEmester) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `There is already an ${isThereAnyUpcomingOrOngoingSEmester.status} registered semester !`,
+      `There is aready an ${isThereAnyUpcomingOrOngoingSEmester.status} registered semester !`,
     );
   }
   // check if the semester is exist
@@ -76,11 +77,16 @@ const getAllSemesterRegistrationsFromDB = async (
     .fields();
 
   const result = await semesterRegistrationQuery.modelQuery;
-  return result;
+  const meta = await semesterRegistrationQuery.countTotal();
+  return {
+    result,
+    meta,
+  };
 };
 
 const getSingleSemesterRegistrationsFromDB = async (id: string) => {
-  const result = await SemesterRegistration.findById(id);
+  const result =
+    await SemesterRegistration.findById(id).populate('academicSemester');
 
   return result;
 };
@@ -152,7 +158,7 @@ const updateSemesterRegistrationIntoDB = async (
 const deleteSemesterRegistrationFromDB = async (id: string) => {
   /** 
   * Step1: Delete associated offered courses.
-  * Step2: Delete semester registraton when the status is 
+  * Step2: Delete semester registration when the status is 
   'UPCOMING'.
   **/
 
@@ -199,13 +205,13 @@ const deleteSemesterRegistrationFromDB = async (id: string) => {
       );
     }
 
-    const deletedSemisterRegistration =
+    const deletedSemesterRegistration =
       await SemesterRegistration.findByIdAndDelete(id, {
         session,
         new: true,
       });
 
-    if (!deletedSemisterRegistration) {
+    if (!deletedSemesterRegistration) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'Failed to delete semester registration !',
